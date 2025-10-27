@@ -29,6 +29,15 @@ bool is_file(const char *path) {
 	return S_ISREG(path_stat.st_mode);
 }
 
+bool is_symlink(const char *path) {
+	struct stat path_stat;
+
+	if (stat(path, &path_stat) != 0)
+		return false;
+
+	return S_ISLNK(path_stat.st_mode);
+}
+
 bool is_dir(const char *path) {
 	struct stat path_stat;
 	
@@ -36,6 +45,10 @@ bool is_dir(const char *path) {
 		return false;
 
 	return S_ISDIR(path_stat.st_mode);
+}
+
+bool is_executable(const char *path) {
+	return access(path, X_OK) == 0;
 }
 
 void sort(char **entries, size_t count) {
@@ -86,4 +99,14 @@ void toggle_input() {
 		tcsetattr(STDIN_FILENO, TCSANOW, &old);
 		enabled = !enabled;
 	}
+}
+
+char* get_color(const char* path) {
+	if (is_dir(path)) return "\x1b[46m   \x1b[0m";
+	if (is_symlink(path)) return "\x1b[45m   \x1b[0m";
+	
+	if (is_file(path)) {
+		if (is_executable(path)) return "\x1b[42m   \x1b[0m";
+	}
+	return "\x1b[43m   \x1b[0m";
 }

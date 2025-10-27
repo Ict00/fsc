@@ -63,7 +63,7 @@ void update_fs() {
 	}
 }
 
-void bar(char* str) {
+void bar(char* str, bool newLine) {
 	int len = strlen(str);
 	
 	for (int x = 0; x < WIDTH; x++)
@@ -71,14 +71,15 @@ void bar(char* str) {
 			printf("%c", str[x]);
 		else
 			printf(" ");
-	printf("\n");
+	if (newLine)
+		printf("\n");
 }
 
 void draw() {
 	setlocale(LC_ALL, 0);
 	printf("\x1b[41m");
 	
-	bar(path);
+	bar(path, true);
 	
 	printf("\x1b[0m"); fflush(stdout);
 	
@@ -92,18 +93,18 @@ void draw() {
 			printf("\n");
 			continue;
 		}
-		printf("%s%-*s %s\n", selected == i ? "\x1b[47;30m>\x1b[0m" : " ", ln, curDirEntries[i], is_file(curDirEntries[i]) ? "\x1b[43m   \x1b[0m" : "\x1b[46m   \x1b[0m");
+		printf("%s%-*s %s\n", selected == i ? "\x1b[47;30m>\x1b[0m" : " ", ln, curDirEntries[i], get_color(curDirEntries[i]));
 	}
 		
 	char buf1[256];
 	sprintf(buf1, "%d OUT OF %d PAGES", page+1, 1+(int)curDirCount/pageSize);
 	
 	printf("\x1b[44m");
-	bar(buf1);
+	bar(buf1, true);
 	printf("\x1b[0m");
 	
 	printf("\x1b[104m");
-	bar("F - Search, WASD ENTER - Navigate, P - Run CMD, ` - Run CMD (No output)");
+	bar("F - Search, WASD ENTER - Navigate, P - Run CMD, ` - Run CMD (No output)", true);
 	printf("\x1b[0m");
 
 	fflush(stdout);
@@ -128,7 +129,6 @@ void execute(bool out) {
 	if (out) {
 		printf("\x1b[2J\x1b[H"); fflush(stdout);
 	}
-	
 	system(line);
 	free(line);
 	
@@ -205,7 +205,6 @@ int main() {
 			case 'p':
 				execute(true);
 				update_fs();
-				
 				break;
 			case 'f':
 				draw();
@@ -239,9 +238,9 @@ int main() {
 				
 				if (newEntriesCur == 0) {
 					free(newEntries);
-					printf("\x1b[2K\x1b[%dD", WIDTH);
+					printf("\x1b[1A\x1b[2K\x1b[%dD", WIDTH);
 					printf("\x1b[41m");
-					bar("Not found");
+					bar("Not found", false);
 					printf("\x1b[0m");
 					toggle_input();
 					getc(stdin);
