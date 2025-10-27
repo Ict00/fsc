@@ -1,6 +1,7 @@
 #include "utils.h"
 #include <ctype.h>
 #include <dirent.h>
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,10 +25,6 @@ void re_calc_sizes() {
 	pageSize = HEIGHT-2;
 }
 
-void update_pages() {
-	
-}
-
 void update_fs() {
 	free(curDirEntries);
 	curDirCap = 32;
@@ -42,6 +39,8 @@ void update_fs() {
 	if (dir == NULL) exit(-1);
 	
 	while((entry = readdir(dir)) != NULL) {
+		//if (strcmp(entry->d_name, "..") == 0 || strcmp(entry->d_name, ".") == 0) continue;
+		
 		if (curDirCount == curDirCap) {
 			curDirCap *= 2;
 			curDirEntries = realloc(curDirEntries, sizeof(char*)*curDirCap);
@@ -58,6 +57,10 @@ void update_fs() {
 	if (selected >= curDirCount) {
 		selected = 0;
 	}
+	if (selected >= pageSize) {
+		selected = 0;
+		page = 0;
+	}
 }
 
 void bar(char* str) {
@@ -72,21 +75,24 @@ void bar(char* str) {
 }
 
 void draw() {
+	setlocale(LC_ALL, 0);
 	printf("\x1b[41m");
 	
 	bar(path);
 	
-	printf("\x1b[0m");
+	printf("\x1b[0m"); fflush(stdout);
 	
-	char format[256];
-	sprintf(format, "%%s%%-%ds %%s\n", longest(curDirEntries, curDirCount)+3);
+	int ln = longest(curDirEntries, curDirCount)+3;
 	
+	if (ln >= WIDTH)
+		ln = WIDTH - 6;
+		
 	for (int i = page*pageSize; i < ((page+1)*pageSize); i++) {
 		if (i >= curDirCount) {
 			printf("\n");
 			continue;
 		}
-		printf(format, selected == i ? "\x1b[47;30m>\x1b[0m" : " ", curDirEntries[i], is_file(curDirEntries[i]) ? "\x1b[43m   \x1b[0m" : "\x1b[46m   \x1b[0m");
+		printf("%s%-*s %s\n", selected == i ? "\x1b[47;30m>\x1b[0m" : " ", ln, curDirEntries[i], is_file(curDirEntries[i]) ? "\x1b[43m   \x1b[0m" : "\x1b[46m   \x1b[0m");
 	}
 		
 	char buf1[256];
@@ -94,6 +100,10 @@ void draw() {
 	
 	printf("\x1b[44m");
 	bar(buf1);
+	printf("\x1b[0m");
+	
+	printf("\x1b[104m");
+	bar("SOME HELP");
 	printf("\x1b[0m");
 
 	fflush(stdout);
@@ -155,6 +165,57 @@ int main() {
 				chdir(basename(curDirEntries[selected]));
 				getcwd(path, sizeof(path));
 				update_fs();
+				break;
+			case 'r':
+				update_fs();
+				break;
+			case 'f':
+				draw();
+				toggle_input();
+				printf("\x1b[%d;0H", HEIGHT+2); fflush(stdout);
+				
+				char* line = NULL;
+				size_t lineLen = 0;
+				if (getline(&line, &lineLen, stdin) == -1) {
+					free(line);
+					toggle_input();
+					break;
+				}
+				
+				if (line[strlen(line)-1] == '\n')
+					line[strlen(line)-1] = '\0';
+			    
+				if (selected != -1)
+					selected = 0;
+			    
+				size_t newEntriesCur = 0;
+				char** newEntries = malloc(sizeof(char*)*curDirCap);
+				
+				for (int i = 0; i < curDirCount; i++) {
+					if (strstr(curDirEntries[i], line) != NULL) {
+						newEntries[newEntriesCur] = curDirEntries[i];
+						newEntriesCur++;
+					}
+				}
+				free(line);
+				
+				if (newEntriesCur == 0) {
+					free(newEntries);
+					printf("\x1b[2K\x1b[%dD", WIDTH);
+					printf("\x1b[41m");
+					bar("Not found");
+					printf("\x1b[0m");
+					toggle_input();
+					getc(stdin);
+					break;
+				}
+				
+				free(curDirEntries);
+				curDirEntries = newEntries;
+				curDirCount = newEntriesCur;
+				
+				toggle_input();
+				printf("\x1b[2J\x1b[H");
 				break;
 		}
 		
