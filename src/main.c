@@ -103,11 +103,39 @@ void draw() {
 	printf("\x1b[0m");
 	
 	printf("\x1b[104m");
-	bar("SOME HELP");
+	bar("F - Search, WASD ENTER - Navigate, P - Run CMD, ` - Run CMD (No output)");
 	printf("\x1b[0m");
 
 	fflush(stdout);
 	
+}
+
+void execute(bool out) {
+	draw();
+	toggle_input();
+	
+	printf("\x1b[%d;0H", HEIGHT+2); fflush(stdout);
+	
+	char* line = NULL;
+	size_t lineLen = 0;
+	
+	if (getline(&line, &lineLen, stdin) == -1) {
+		free(line);
+		toggle_input();
+		return;
+	}
+	
+	if (out) {
+		printf("\x1b[2J\x1b[H"); fflush(stdout);
+	}
+	
+	system(line);
+	free(line);
+	
+	toggle_input();
+	
+	if (out)
+		getc(stdin);
 }
 
 int main() {
@@ -160,6 +188,7 @@ int main() {
 				getcwd(path, sizeof(path));
 				update_fs();
 				break;
+			case 10:
 			case 'd':
 				if (selected == -1) break;
 				chdir(basename(curDirEntries[selected]));
@@ -168,6 +197,15 @@ int main() {
 				break;
 			case 'r':
 				update_fs();
+				break;
+			case '`':
+				execute(false);
+				update_fs();
+				break;
+			case 'p':
+				execute(true);
+				update_fs();
+				
 				break;
 			case 'f':
 				draw();
@@ -215,11 +253,11 @@ int main() {
 				curDirCount = newEntriesCur;
 				
 				toggle_input();
-				printf("\x1b[2J\x1b[H");
 				break;
 		}
 		
 		re_calc_sizes();
+		printf("\x1b[2J\x1b[H");
 	}
 	
 	toggle_input();
