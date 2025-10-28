@@ -232,6 +232,28 @@ int main() {
 			case 'q':
 				up = false;
 				break;
+			case 'm':
+				if (selected == -1) break;
+				if (actionEntries == NULL) break;
+				
+				char* targetBase = curDirEntries[selected];
+				
+				for (int i = 0; i < actionCount; i++) {
+					char* dup = strdup(actionEntries[i]);
+					char* base = basename(dup);
+					
+					char target[4096];
+					sprintf(target, "%s/%s", targetBase, base);
+					
+					rename(actionEntries[i], target);
+					
+					free(dup);
+				}
+				
+				cleanup_actions();
+				update_fs();
+				
+				break;
 			case 'u':
 				selected = -1;
 				cleanup_actions();
