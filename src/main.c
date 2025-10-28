@@ -258,6 +258,7 @@ int main() {
 				if (actionEntries == NULL) break;
 				
 				char* targetBase = curDirEntries[selected];
+				if (!is_dir(targetBase)) break;
 				
 				for (int i = 0; i < actionCount; i++) {
 					char* dup = strdup(actionEntries[i]);
@@ -269,6 +270,22 @@ int main() {
 					rename(actionEntries[i], target);
 					
 					free(dup);
+				}
+				
+				cleanup_actions();
+				update_fs();
+				break;
+			case 'c':
+				if (actionEntries == NULL) break;
+				if (selected == -1) break;
+				
+				if (!is_dir(curDirEntries[selected])) break;
+				
+				for (int i = 0; i < actionCount; i++) {
+					char cmd[4096];
+					
+					sprintf(cmd, "cp -r \"%s\" \"%s\"", actionEntries[i], curDirEntries[selected]);
+					system(cmd);
 				}
 				
 				cleanup_actions();
