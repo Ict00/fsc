@@ -392,6 +392,30 @@ int main() {
 			case 'i':
 				add2action();
 				break;
+			case 'l':
+				if (selected == -1) {
+					selected = 0;
+				}
+				
+				int max = curDirCount/pageSize + 1;
+				if (page+1<max) {
+					if (selected + pageSize < curDirCount)
+						selected += pageSize;
+					else
+						selected = curDirCount-1;
+					page++;
+				}
+				break;
+			case 'k':
+				if (selected == -1) {
+					selected = 0;
+				}
+				
+				if (page-1>=0) {
+					selected -= pageSize;
+					page--;
+				}
+				break;
 			case 'f':
 				char* line = askline();
 				if (line == NULL) break;
@@ -428,6 +452,15 @@ int main() {
 				free(curDirEntries);
 				curDirEntries = newEntries;
 				curDirCount = newEntriesCur;
+				
+				page = 0;
+				if (selected >= curDirCount) {
+					selected = 0;
+				}
+				if (selected >= pageSize) {
+					selected = 0;
+					page = 0;
+				}
 				
 				break;
 		}
