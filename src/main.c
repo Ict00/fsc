@@ -89,7 +89,6 @@ void add2action() {
 			
 			return;
 		}
-	
 		
 		actionEntries[actionCount] = strdup(buf);
 		actionCount++;
@@ -131,6 +130,11 @@ void update_fs() {
 	}
 	
 	closedir(dir);
+	char** temp = curDirEntries;
+	curDirEntries = filter(curDirEntries, curDirCount, &curDirCount);
+	
+	free(temp);
+	
 	sort(curDirEntries, curDirCount);
 	
 	page = 0;
@@ -383,6 +387,21 @@ int main() {
 				break;
 			case '`':
 				execute(false);
+				update_fs();
+				break;
+			case 'v':
+				char* newSettings = askline();
+				
+				for (int i = 0; newSettings[i] != 0; i++) {
+					if (newSettings[i] == 'h') {
+						hideHidden = false;
+					}
+					else if (newSettings[i] == 'H') {
+						hideHidden = true;
+					}
+				}
+				
+				free(newSettings);
 				update_fs();
 				break;
 			case 'p':

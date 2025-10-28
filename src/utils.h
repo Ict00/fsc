@@ -4,11 +4,14 @@
 
 extern int WIDTH, HEIGHT;
 
+extern bool hideHidden;
+
 void get_size();
 bool is_dir(const char* path);
 bool is_file(const char* path);
 bool is_symlink(const char* path);
 bool is_executable(const char* path);
+char** filter(char** entries, size_t count, size_t* newCount);
 void sort(char** entries, size_t count);
 bool is_sorted(char** entries, size_t count);
 int longest(char** entries, size_t count);

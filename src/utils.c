@@ -9,6 +9,8 @@
 
 int WIDTH, HEIGHT;
 
+bool hideHidden = false;
+
 void get_size() {
 	struct winsize w;
 
@@ -49,6 +51,29 @@ bool is_dir(const char *path) {
 
 bool is_executable(const char *path) {
 	return access(path, X_OK) == 0;
+}
+
+char** filter(char** entries, size_t count, size_t* newCount) {
+	char** newEntries = malloc(sizeof(char*)*count);
+	size_t c = 0;
+	
+	for (int i = 0; i < count; i++) {
+		if(hideHidden) {
+			if (entries[i][0] != '.' || (strcmp(entries[i], ".") == 0 || strcmp(entries[i], "..") == 0)) {
+				goto filterPassed;
+			}
+			
+			free(entries[i]);
+			continue;
+		}
+filterPassed:
+		newEntries[c] = entries[i];
+		c++;
+	}
+	
+	*newCount = c;
+	
+	return newEntries;
 }
 
 void sort(char **entries, size_t count) {
