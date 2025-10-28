@@ -103,6 +103,12 @@ void re_calc_sizes() {
 }
 
 void update_fs() {
+	for (int i = 0; i < curDirCount; i++) {
+		if (curDirEntries[i] == NULL) continue;
+		
+		free(curDirEntries[i]);
+	}
+	
 	free(curDirEntries);
 	curDirCap = 32;
 	curDirEntries = malloc(sizeof(char*)*curDirCap);
@@ -120,7 +126,7 @@ void update_fs() {
 			curDirCap *= 2;
 			curDirEntries = realloc(curDirEntries, sizeof(char*)*curDirCap);
 		}
-		curDirEntries[curDirCount] = entry->d_name;
+		curDirEntries[curDirCount] = strdup(entry->d_name);
 		curDirCount++;
 	}
 	
@@ -186,34 +192,6 @@ void draw() {
 	
 }
 
-void execute(bool out) {
-	draw();
-	toggle_output();
-	toggle_input();
-	
-	printf("\x1b[%d;0H", HEIGHT+2); fflush(stdout);
-	
-	char* line = NULL;
-	size_t lineLen = 0;
-	
-	if (getline(&line, &lineLen, stdin) == -1) {
-		free(line);
-		toggle_input();
-		return;
-	}
-	
-	if (out) {
-		printf("\x1b[2J\x1b[H"); fflush(stdout);
-	}
-	system(line);
-	free(line);
-	
-	toggle_input();
-	
-	if (out)
-		getc(stdin);
-}
-
 char* askline() {
 	draw();
 	toggle_input();
@@ -233,6 +211,19 @@ char* askline() {
 	toggle_input();
 	
 	return line;
+}
+
+void execute(bool out) {
+	char* line = askline();
+	
+	if (out) {
+		printf("\x1b[2J\x1b[H"); fflush(stdout);
+	}
+	system(line);
+	free(line);
+		
+	if (out)
+		getc(stdin);
 }
 
 int main() {
@@ -414,6 +405,10 @@ int main() {
 						newEntries[newEntriesCur] = curDirEntries[i];
 						newEntriesCur++;
 					}
+					else {
+						free(curDirEntries[i]);
+						curDirEntries[i] = NULL;
+					}
 				}
 				free(line);
 				
@@ -423,6 +418,7 @@ int main() {
 					printf("\x1b[41m");
 					bar("Not found", false);
 					printf("\x1b[0m");
+					update_fs();
 					getc(stdin);
 					break;
 				}
