@@ -84,6 +84,19 @@ int longest(char **entries, size_t count) {
 	return l;
 }
 
+void toggle_output() {
+	static bool enabled = true;
+	
+	if (enabled) {
+		printf("\x1b[?1049h"); fflush(stdout);
+		enabled = !enabled;
+	}
+	else {
+		printf("\x1b[?1049l"); fflush(stdout);
+		enabled = !enabled;
+	}
+}
+
 void toggle_input() {
 	static struct termios old, new;
 	static bool enabled = true;
@@ -102,7 +115,11 @@ void toggle_input() {
 }
 
 char* get_color(const char* path) {
-	if (is_dir(path)) return "\x1b[46m   \x1b[0m";
+	if (is_dir(path)) {
+		if (strcmp(path, "..") == 0 || strcmp(path, ".") == 0) return "\x1b[47m   \x1b[0m";
+		
+		return "\x1b[46m   \x1b[0m";
+	}
 	if (is_symlink(path)) return "\x1b[45m   \x1b[0m";
 	
 	if (is_file(path)) {

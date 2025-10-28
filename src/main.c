@@ -9,6 +9,10 @@
 #include <unistd.h>
 #include <libgen.h>
 
+char** actionEntries = NULL;
+size_t actionCap = 32;
+size_t actionCount = 0;
+
 char path[4096];
 int page = 0;
 int pageSize;
@@ -19,6 +23,79 @@ size_t curDirCap = 32;
 size_t curDirCount = 0;
 
 bool up = true;
+
+void cleanup_actions() {
+	if (actionEntries == NULL) {
+		actionCap = 32;
+		actionCount = 0;
+		return;
+	}
+	
+	for (int i = 0; i < actionCount; i++) {
+		if (actionEntries[i] == NULL) continue;
+		free(actionEntries[i]);
+	}
+	
+	actionCap = 32;
+	actionCount = 0;
+	
+	if (actionEntries != NULL) {
+		free(actionEntries);
+		actionEntries = NULL;
+	}
+}
+
+bool is_in_actions(char* path) {
+	if (actionEntries == NULL) return false;
+	char abs[4096];
+	
+	if (realpath(path, abs) == NULL) return false;
+	
+	for (int i = 0; i < actionCount; i++) {
+		if (actionEntries[i] == NULL) continue;
+		
+		if (strcmp(actionEntries[i], abs) == 0) {
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+void add2action() {
+	if (selected == -1) return;
+	
+	if (actionEntries == NULL) {
+		actionEntries = malloc(actionCap*sizeof(char*));
+	}
+	
+	if (actionCount == actionCap) {
+		actionCap *= 2;
+		actionEntries = realloc(actionEntries, sizeof(char*)*actionCap);
+	}
+	char buf[4096];
+	
+	if (realpath(curDirEntries[selected], buf) != NULL) {
+		if (is_in_actions(buf)) {
+			for (int i = 0; i < actionCount; i++) {
+				if (actionEntries[i] == NULL) continue;
+				
+				if (strcmp(actionEntries[i], buf) == 0) {
+					free(actionEntries[i]);
+					actionEntries[i] = NULL;
+					return;
+				}
+			}
+			
+			return;
+		}
+	
+		
+		actionEntries[actionCount] = strdup(buf);
+		actionCount++;
+	}
+	else return;
+}
 
 void re_calc_sizes() {
 	get_size();
@@ -38,9 +115,7 @@ void update_fs() {
 	
 	if (dir == NULL) exit(-1);
 	
-	while((entry = readdir(dir)) != NULL) {
-		//if (strcmp(entry->d_name, "..") == 0 || strcmp(entry->d_name, ".") == 0) continue;
-		
+	while((entry = readdir(dir)) != NULL) {		
 		if (curDirCount == curDirCap) {
 			curDirCap *= 2;
 			curDirEntries = realloc(curDirEntries, sizeof(char*)*curDirCap);
@@ -93,7 +168,7 @@ void draw() {
 			printf("\n");
 			continue;
 		}
-		printf("%s%-*s %s\n", selected == i ? "\x1b[47;30m>\x1b[0m" : " ", ln, curDirEntries[i], get_color(curDirEntries[i]));
+		printf("%s%-*s %s\n", selected == i ? "\x1b[47;30m>\x1b[0m" : is_in_actions(curDirEntries[i]) ? "\x1b[47;30m?\x1b[0m" : " ", ln, curDirEntries[i], get_color(curDirEntries[i]));
 	}
 		
 	char buf1[256];
@@ -113,6 +188,7 @@ void draw() {
 
 void execute(bool out) {
 	draw();
+	toggle_output();
 	toggle_input();
 	
 	printf("\x1b[%d;0H", HEIGHT+2); fflush(stdout);
@@ -158,6 +234,7 @@ int main() {
 				break;
 			case 'u':
 				selected = -1;
+				cleanup_actions();
 				break;
 			case 'w':
 				if (selected == -1)
@@ -191,7 +268,7 @@ int main() {
 			case 10:
 			case 'd':
 				if (selected == -1) break;
-				chdir(basename(curDirEntries[selected]));
+				chdir(curDirEntries[selected]);
 				getcwd(path, sizeof(path));
 				update_fs();
 				break;
@@ -205,6 +282,21 @@ int main() {
 			case 'p':
 				execute(true);
 				update_fs();
+				break;
+			case 'i':
+				add2action();
+				break;
+			case 'o':
+				printf("\x1b[2J\x1b[H");
+				
+				for (int i = 0; i < actionCount; i++) {
+					if (actionEntries[i] == NULL) continue;
+					
+					printf("%s\n", actionEntries[i]);
+				}
+				
+				getc(stdin);
+				cleanup_actions();
 				break;
 			case 'f':
 				draw();
@@ -260,5 +352,6 @@ int main() {
 	}
 	
 	toggle_input();
+	toggle_output();
 	return 0;
 }
