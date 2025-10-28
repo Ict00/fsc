@@ -197,10 +197,10 @@ void draw() {
 	
 }
 
-char* askline() {
+char* askprompt(char* prompt) {
 	draw();
 	toggle_input();
-	printf("\x1b[%d;0H", HEIGHT+2); fflush(stdout);
+	printf("\x1b[%d;0H%s", HEIGHT+2, prompt); fflush(stdout);
 	
 	char* line = NULL;
 	size_t lineLen = 0;
@@ -216,6 +216,10 @@ char* askline() {
 	toggle_input();
 	
 	return line;
+}
+
+char* askline() {
+	return askprompt("");
 }
 
 void execute(bool out) {
@@ -297,6 +301,14 @@ int main() {
 				break;
 			case 'r':
 				if (actionEntries == NULL) break;
+				
+				char* sure = askprompt("Are you sure? (yes/no) ");
+				if (sure == NULL) break;
+				if (strcmp(sure, "yes") != 0) {
+					free(sure);
+					break;
+				}
+				free(sure);
 				
 				for (int i = 0; i < actionCount; i++) {
 					char cmd[4096];
