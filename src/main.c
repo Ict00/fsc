@@ -436,6 +436,23 @@ int main() {
 					page--;
 				}
 				break;
+			case 'y':
+				char* format = askline();
+				if (format == NULL) break;
+				int tempSel = selected;
+				
+				for (int i = 0; i < curDirCount; i++) {
+					if (matches(format, curDirEntries[i])) {
+						selected = i;
+						add2action();
+					}
+				}
+				
+				selected = tempSel;
+				
+				free(format);
+				
+				break;
 			case 'f':
 				char* line = askline();
 				if (line == NULL) break;
