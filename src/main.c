@@ -214,6 +214,27 @@ void execute(bool out) {
 		getc(stdin);
 }
 
+char* askline() {
+	draw();
+	toggle_input();
+	printf("\x1b[%d;0H", HEIGHT+2); fflush(stdout);
+	
+	char* line = NULL;
+	size_t lineLen = 0;
+	if (getline(&line, &lineLen, stdin) == -1) {
+		free(line);
+		toggle_input();
+		return NULL;
+	}
+	
+	if (line[strlen(line)-1] == '\n')
+		line[strlen(line)-1] = '\0';
+	
+	toggle_input();
+	
+	return line;
+}
+
 int main() {
 	printf("\x1b[2J\x1b[H");
 	toggle_input();
@@ -252,11 +273,42 @@ int main() {
 				
 				cleanup_actions();
 				update_fs();
+				break;
+			case 'r':
+				if (actionEntries == NULL) break;
 				
+				char* newName = askline();
+				
+				if (newName == NULL) break;
+				
+				if (actionCount == 1) {
+					char* tpath = strdup(actionEntries[0]);
+					char ntpath[4096];
+					
+					sprintf(ntpath, "%s/%s", dirname(tpath), newName);
+					rename(actionEntries[0], ntpath);
+					
+					free(tpath);
+				}
+				else {
+					for (int i = 0; i < actionCount; i++) {
+						char* tpath = strdup(actionEntries[0]);
+						char ntpath[4096];
+						free(tpath);
+						
+						sprintf(ntpath, "%s/%s%d", dirname(tpath), newName, i+1);
+						rename(actionEntries[i], ntpath);
+					}
+				}
+				
+				cleanup_actions();
+				
+				update_fs();
 				break;
 			case 'u':
 				selected = -1;
 				cleanup_actions();
+				update_fs();
 				break;
 			case 'w':
 				if (selected == -1)
@@ -294,9 +346,6 @@ int main() {
 				getcwd(path, sizeof(path));
 				update_fs();
 				break;
-			case 'r':
-				update_fs();
-				break;
 			case '`':
 				execute(false);
 				update_fs();
@@ -308,33 +357,9 @@ int main() {
 			case 'i':
 				add2action();
 				break;
-			case 'o':
-				printf("\x1b[2J\x1b[H");
-				
-				for (int i = 0; i < actionCount; i++) {
-					if (actionEntries[i] == NULL) continue;
-					
-					printf("%s\n", actionEntries[i]);
-				}
-				
-				getc(stdin);
-				cleanup_actions();
-				break;
 			case 'f':
-				draw();
-				toggle_input();
-				printf("\x1b[%d;0H", HEIGHT+2); fflush(stdout);
-				
-				char* line = NULL;
-				size_t lineLen = 0;
-				if (getline(&line, &lineLen, stdin) == -1) {
-					free(line);
-					toggle_input();
-					break;
-				}
-				
-				if (line[strlen(line)-1] == '\n')
-					line[strlen(line)-1] = '\0';
+				char* line = askline();
+				if (line == NULL) break;
 			    
 				if (selected != -1)
 					selected = 0;
@@ -356,7 +381,6 @@ int main() {
 					printf("\x1b[41m");
 					bar("Not found", false);
 					printf("\x1b[0m");
-					toggle_input();
 					getc(stdin);
 					break;
 				}
@@ -365,7 +389,6 @@ int main() {
 				curDirEntries = newEntries;
 				curDirCount = newEntriesCur;
 				
-				toggle_input();
 				break;
 		}
 		
