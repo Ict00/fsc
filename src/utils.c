@@ -170,3 +170,39 @@ char* escape(const char* src) {
 	
 	return res;
 }
+
+bool matches(const char* expr, const char* src) {
+	int ei = 0;
+	int si = 0;
+	
+	for(; src[si] != 0; si++) {
+		if (expr[ei] == 0) return false;
+		if (expr[ei] == ',') {
+			ei++;
+			continue;
+		}
+		if (expr[ei] == '*') {
+			if (expr[ei+1] == src[si+1] && expr[ei+1] != 0) {
+				ei++;
+				si++;
+			}
+			else if(expr[ei+1] == src[si] && expr[ei+1] != 0) {
+				ei++;
+			}
+			else continue;
+		}
+		
+		if (expr[ei] == '\\') {
+			ei++;
+		}
+		
+		if (expr[ei] == src[si]) {
+			ei++;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	return strlen(expr)-1 <= ei && strlen(src) == si;
+}

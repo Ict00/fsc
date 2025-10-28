@@ -19,3 +19,4 @@ void toggle_input();
 void toggle_output();
 char* get_color(const char* path);
 char* escape(const char* source);
+bool matches(const char* expr, const char* src);

@@ -89,6 +89,7 @@ void add2action() {
 			
 			return;
 		}
+	
 		
 		actionEntries[actionCount] = strdup(buf);
 		actionCount++;
@@ -446,7 +447,7 @@ int main() {
 				char** newEntries = malloc(sizeof(char*)*curDirCap);
 				
 				for (int i = 0; i < curDirCount; i++) {
-					if (strstr(curDirEntries[i], line) != NULL) {
+					if (matches(line, curDirEntries[i])) {
 						newEntries[newEntriesCur] = curDirEntries[i];
 						newEntriesCur++;
 					}
