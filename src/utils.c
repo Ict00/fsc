@@ -127,3 +127,21 @@ char* get_color(const char* path) {
 	}
 	return "\x1b[43m   \x1b[0m";
 }
+
+char* escape(const char* src) {
+	int l = strlen(src);
+	char* res = malloc(sizeof(char)*(l*2+1));
+	int b = 0;
+	for (int i = 0; i < l; i++) {
+		if (src[i] == '"') {
+			res[b] = '\\';
+			b++;
+		}
+		res[b] = src[i];
+		b++;
+	}
+	res[b] = 0;
+	res = realloc(res, sizeof(char)*(b+1));
+	
+	return res;
+}

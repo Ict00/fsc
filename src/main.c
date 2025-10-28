@@ -281,17 +281,42 @@ int main() {
 				
 				if (!is_dir(curDirEntries[selected])) break;
 				
+				char* nodeB = escape(curDirEntries[selected]);
+				
 				for (int i = 0; i < actionCount; i++) {
 					char cmd[4096];
+					char* nodeA = escape(actionEntries[i]);
 					
-					sprintf(cmd, "cp -r \"%s\" \"%s\"", actionEntries[i], curDirEntries[selected]);
+					
+					sprintf(cmd, "cp -r \"%s\" \"%s\"", nodeA, nodeB);
 					system(cmd);
+					
+					free(nodeA);
 				}
+				
+				free(nodeB);
 				
 				cleanup_actions();
 				update_fs();
 				break;
 			case 'r':
+				if (actionEntries == NULL) break;
+				
+				for (int i = 0; i < actionCount; i++) {
+					char cmd[4096];
+					
+					char* nodeA = escape(actionEntries[i]);
+					
+					sprintf(cmd, "rm -rf \"%s\"", nodeA);
+					
+					system(cmd);
+					free(nodeA);
+				}
+				
+				cleanup_actions();
+				update_fs();
+				break;
+			case 'n':
 				if (actionEntries == NULL) break;
 				
 				char* newName = askline();

@@ -15,3 +15,4 @@ int longest(char** entries, size_t count);
 void toggle_input();
 void toggle_output();
 char* get_color(const char* path);
+char* escape(const char* source);
