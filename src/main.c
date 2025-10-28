@@ -327,9 +327,9 @@ int main() {
 					for (int i = 0; i < actionCount; i++) {
 						char* tpath = strdup(actionEntries[0]);
 						char ntpath[4096];
-						free(tpath);
 						
 						sprintf(ntpath, "%s/%s%d", dirname(tpath), newName, i+1);
+						free(tpath);
 						rename(actionEntries[i], ntpath);
 					}
 				}
@@ -375,6 +375,8 @@ int main() {
 			case 10:
 			case 'd':
 				if (selected == -1) break;
+				if (!is_dir(curDirEntries[selected])) break;
+				
 				chdir(curDirEntries[selected]);
 				getcwd(path, sizeof(path));
 				update_fs();
