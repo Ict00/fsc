@@ -106,6 +106,7 @@ void re_calc_sizes() {
 }
 
 void update_fs() {
+	secondSelect = -1;
 	for (int i = 0; i < curDirCount; i++) {
 		if (curDirEntries[i] == NULL) continue;
 		
@@ -416,6 +417,7 @@ int main() {
 				update_fs();
 				break;
 			case 'u':
+				secondSelect = -1;
 				selected = -1;
 				cleanup_actions();
 				update_fs();
