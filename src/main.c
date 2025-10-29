@@ -472,8 +472,8 @@ int main() {
 					}
 				}
 				
-				printf("\x1b[1A\x1b[2K\x1b[%dD", WIDTH);
-				printf("\x1b[41mNot found\x1b[0m");
+				printf("\x1b[1A\x1b[%dD\x1b[2K\x1b[41mNot found\x1b[0m", WIDTH); fflush(stdout);
+				getc(stdin);
 				
 				free(fPattern);
 				break;
