@@ -460,6 +460,23 @@ int main() {
 				getcwd(path, sizeof(path));
 				update_fs();
 				break;
+			case 'x':
+				char* fPattern = askline();
+				if (fPattern == NULL) break;
+				
+				for (int i = 0; i < curDirCount; i++) {
+					if (matches(fPattern, curDirEntries[i])) {
+						selected = i;
+						page = selected/pageSize;
+						break;
+					}
+				}
+				
+				printf("\x1b[1A\x1b[2K\x1b[%dD", WIDTH);
+				printf("\x1b[41mNot found\x1b[0m");
+				
+				free(fPattern);
+				break;
 			case 'e':
 				char* gotoDir = askline();
 				if (gotoDir == NULL) break;
@@ -557,9 +574,7 @@ int main() {
 				if (newEntriesCur == 0) {
 					free(newEntries);
 					printf("\x1b[1A\x1b[2K\x1b[%dD", WIDTH);
-					printf("\x1b[41m");
-					bar("Not found", false);
-					printf("\x1b[0m");
+					printf("\x1b[41mNot found\x1b[0m");
 					update_fs();
 					getc(stdin);
 					break;
