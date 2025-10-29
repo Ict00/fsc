@@ -131,10 +131,8 @@ void update_fs() {
 	}
 	
 	closedir(dir);
-	char** temp = curDirEntries;
 	curDirEntries = filter(curDirEntries, curDirCount, &curDirCount);
 	
-	free(temp);
 	
 	sort(curDirEntries, curDirCount);
 	
@@ -405,14 +403,7 @@ int main() {
 			case 'v':
 				char* newSettings = askline();
 				
-				for (int i = 0; newSettings[i] != 0; i++) {
-					if (newSettings[i] == 'h') {
-						hideHidden = false;
-					}
-					else if (newSettings[i] == 'H') {
-						hideHidden = true;
-					}
-				}
+				process_settings(newSettings);
 				
 				free(newSettings);
 				update_fs();

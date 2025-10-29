@@ -10,6 +10,8 @@
 int WIDTH, HEIGHT;
 
 bool hideHidden = false;
+bool showFiles = true;
+bool showDirs = true;
 
 void get_size() {
 	struct winsize w;
@@ -58,20 +60,50 @@ char** filter(char** entries, size_t count, size_t* newCount) {
 	size_t c = 0;
 	
 	for (int i = 0; i < count; i++) {
+		if ((strcmp(entries[i], ".") == 0 || strcmp(entries[i], "..") == 0)) {
+			goto filterPassed;
+		}
+		
 		if(hideHidden) {
-			if (entries[i][0] != '.' || (strcmp(entries[i], ".") == 0 || strcmp(entries[i], "..") == 0)) {
+			if (entries[i][0] != '.') {
 				goto filterPassed;
 			}
 			
 			free(entries[i]);
 			continue;
 		}
+		
+		if (showFiles) {
+			if (is_file(entries[i])) {
+				goto filterPassed;
+			}
+		}
+		else {
+			if (is_file(entries[i])) {
+				free(entries[i]);
+				continue;
+			}
+		}
+		
+		if (showDirs) {
+			if (is_dir(entries[i])) {
+				goto filterPassed;
+			}
+		}
+		else {
+			if (is_dir(entries[i])) {
+				free(entries[i]);
+				continue;
+			}
+		}
+		
 filterPassed:
 		newEntries[c] = entries[i];
 		c++;
 	}
 	
 	*newCount = c;
+	free(entries);
 	
 	return newEntries;
 }
@@ -205,4 +237,29 @@ bool matches(const char* expr, const char* src) {
 	}
 	
 	return strlen(expr)-1 <= ei && strlen(src) == si;
+}
+
+void process_settings(const char* newSettings) {
+	for (int i = 0; newSettings[i] != 0; i++) {
+		switch (newSettings[i]) { 
+			case 'H':
+				hideHidden = true;
+				break;
+			case 'h':
+				hideHidden = false;			
+				break;
+			case 'D':
+				showDirs = false;
+				break;
+			case 'd':
+				showDirs = true;		
+				break;
+			case 'F':
+				showFiles = false;
+				break;
+			case 'f':
+				showFiles = true;			
+				break;
+		}
+	}
 }
