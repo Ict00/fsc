@@ -1,5 +1,6 @@
 # FSC
-FS Control is a powerful TUI file manager with advanced file operations
+FS Control is a TUI file manager
+(Might still be buggy)
 
 # Usage
 ## Controls
