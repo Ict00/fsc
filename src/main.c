@@ -460,6 +460,18 @@ int main() {
 				getcwd(path, sizeof(path));
 				update_fs();
 				break;
+			case 'e':
+				char* gotoDir = askline();
+				if (gotoDir == NULL) break;
+				
+				if (!is_dir(gotoDir)) break;
+				
+				chdir(gotoDir);
+				getcwd(path, sizeof(path));
+				update_fs();
+				
+				free(gotoDir);
+				break;
 			case ';':
 				execute(false);
 				update_fs();
