@@ -10,10 +10,14 @@ FS Control is a TUI file manager
 * **A** - Move to parent directory
 * **D/Enter** - Enter selected directory
 * **K/L** - Page up/down navigation
-* **U** - Unselect all and clear action list
+
+### Selection & Range Operations
+* **I** - Add/Remove current file/dir to action list (marked with `?`)
+* **[** - Set start of selection range (marked with `[`)
+* **]** - Add all files in range to action list (marked with `|` and `]`)
+* **U** - Clear all selections and action list
 
 ### File Operations
-* **I** - Add/Remove current file/dir to action list (marked with `?`)
 * **R** - Remove all files/dirs in action list (with confirmation)
 * **C** - Copy all files/dirs in action list to selected directory
 * **M** - Move all files/dirs in action list to selected directory
@@ -41,13 +45,17 @@ FS Control is a TUI file manager
 * **Selection indicators**:
   - `>` - Currently selected item
   - `?` - Item in action list
+  - `[` - Start of selection range
+  - `]` - End of selection range  
+  - `|` - Items within selection range
 * **Pagination** - Handles large directories efficiently
 
 ## Search Patterns
 Supports advanced pattern matching:
-- `*` - Wildcard character
+- `*` - Wildcard character (matches any sequence)
 - `,` - Multiple conditions
 - `\` - Escape special characters
+- Excludes `.` and `..` entries automatically
 
 # Quick Start
 
