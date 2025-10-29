@@ -64,17 +64,16 @@ char** filter(char** entries, size_t count, size_t* newCount) {
 			goto filterPassed;
 		}
 		
-		if(hideHidden) {
-			if (entries[i][0] != '.') {
-				goto filterPassed;
-			}
-			
-			free(entries[i]);
-			continue;
-		}
-		
 		if (showFiles) {
 			if (is_file(entries[i])) {
+				if(hideHidden) {
+					if (entries[i][0] != '.') {
+						goto filterPassed;
+					}
+					
+					free(entries[i]);
+					continue;
+				}
 				goto filterPassed;
 			}
 		}
@@ -87,6 +86,14 @@ char** filter(char** entries, size_t count, size_t* newCount) {
 		
 		if (showDirs) {
 			if (is_dir(entries[i])) {
+				if(hideHidden) {
+					if (entries[i][0] != '.') {
+						goto filterPassed;
+					}
+					
+					free(entries[i]);
+					continue;
+				}
 				goto filterPassed;
 			}
 		}
