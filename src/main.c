@@ -463,19 +463,23 @@ int main() {
 			case 'x':
 				char* fPattern = askline();
 				if (fPattern == NULL) break;
+				bool matchFound = false;
 				
 				for (int i = 0; i < curDirCount; i++) {
 					if (matches(fPattern, curDirEntries[i])) {
 						selected = i;
 						page = selected/pageSize;
+						matchFound = true;
 						break;
 					}
 				}
 				
-				printf("\x1b[1A\x1b[%dD\x1b[2K\x1b[41mNot found\x1b[0m", WIDTH); fflush(stdout);
-				getc(stdin);
-				
-				free(fPattern);
+				if (!matchFound) {
+					printf("\x1b[1A\x1b[%dD\x1b[2K\x1b[41mNot found\x1b[0m", WIDTH); fflush(stdout);
+					getc(stdin);
+					
+					free(fPattern);
+				}
 				break;
 			case 'e':
 				char* gotoDir = askline();
