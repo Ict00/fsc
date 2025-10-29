@@ -19,6 +19,7 @@ char path[4096];
 int page = 0;
 int pageSize;
 int selected = 0;
+int secondSelect = -1;
 
 char** curDirEntries = NULL;
 size_t curDirCap = 32;
@@ -47,7 +48,7 @@ void cleanup_actions() {
 	}
 }
 
-bool is_in_actions(char* path) {
+bool is_in_actions(const char* path) {
 	if (actionEntries == NULL) return false;
 	char abs[4096];
 	
@@ -161,6 +162,41 @@ void bar(char* str, bool newLine) {
 		printf("\n");
 }
 
+char* get_prefix(const char* entry, int i) {
+	if (secondSelect != -1) {
+		int a = selected;
+		int b = secondSelect;
+		
+		if (a > b) {
+			int temp = a;
+			a = b;
+			b = temp;
+		}
+		
+		if (i == a) {
+			return "\x1b[47;30m[\x1b[0m";
+		}
+		
+		if (i == b) {
+			return "\x1b[47;30m]\x1b[0m";
+		}
+		
+		if (i > a && i < b) {
+			return "\x1b[47;30m|\x1b[0m";
+		}
+	}
+	
+	if (selected == i) {
+		return "\x1b[47;30m>\x1b[0m";
+	}
+	
+	if (is_in_actions(entry)) {
+		return "\x1b[47;30m?\x1b[0m";
+	}
+	
+	return " ";
+}
+
 void draw() {
 	setlocale(LC_ALL, 0);
 	printf("\x1b[41m");
@@ -179,7 +215,7 @@ void draw() {
 			printf("\n");
 			continue;
 		}
-		printf("%s%-*s %s\n", selected == i ? "\x1b[47;30m>\x1b[0m" : is_in_actions(curDirEntries[i]) ? "\x1b[47;30m?\x1b[0m" : " ", ln, curDirEntries[i], get_color(curDirEntries[i]));
+		printf("%s%-*s %s\n", get_prefix(curDirEntries[i], i), ln, curDirEntries[i], get_color(curDirEntries[i]));
 	}
 		
 	char buf1[256];
@@ -252,6 +288,30 @@ int main() {
 		switch (input) {
 			case 'q':
 				up = false;
+				break;
+			case '[':
+				secondSelect = selected;
+				break;
+			case ']':
+				int aSel = secondSelect;
+				int bSel = selected;
+				
+				int saveSel = selected;
+				
+				if (bSel < aSel) {
+					int tempSel = aSel;
+					aSel = bSel;
+					bSel = aSel;
+				}
+				
+				for (int i = aSel; i <= bSel; i++) {
+					selected = i;
+					add2action();
+				}
+				
+				secondSelect = -1;
+				selected = saveSel;
+				
 				break;
 			case 'm':
 				if (selected == -1) break;

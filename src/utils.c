@@ -214,28 +214,27 @@ bool matches(const char* expr, const char* src) {
 	int ei = 0;
 	int si = 0;
 	
+	if (strcmp(src, "..") == 0 || strcmp(src, ".") == 0) return false;
+	
 	for(; src[si] != 0; si++) {
 		if (expr[ei] == 0) return false;
+		if (expr[ei] == '*') {
+			if (src[si] == expr[ei+1]) {
+				ei += 2;
+			}
+			continue;
+		}
+		
 		if (expr[ei] == ',') {
 			ei++;
 			continue;
-		}
-		if (expr[ei] == '*') {
-			if (expr[ei+1] == src[si+1] && expr[ei+1] != 0) {
-				ei++;
-				si++;
-			}
-			else if(expr[ei+1] == src[si] && expr[ei+1] != 0) {
-				ei++;
-			}
-			else continue;
 		}
 		
 		if (expr[ei] == '\\') {
 			ei++;
 		}
 		
-		if (expr[ei] == src[si]) {
+		if (src[si] == expr[ei]) {
 			ei++;
 		}
 		else {
@@ -243,7 +242,7 @@ bool matches(const char* expr, const char* src) {
 		}
 	}
 	
-	return strlen(expr)-1 <= ei && strlen(src) == si;
+	return (strlen(expr) == ei || (strlen(expr) == ei + 1 && expr[ei] == '*')) && strlen(src) == si;
 }
 
 void process_settings(const char* newSettings) {
