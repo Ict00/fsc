@@ -10,6 +10,8 @@ FS Control is a TUI file manager
 * **A** - Move to parent directory
 * **D/Enter** - Enter selected directory
 * **K/L** - Page up/down navigation
+* **X** - Jump to first pattern match 
+* **E** - Jump to specified directory
 
 ### Selection & Range Operations
 * **I** - Add/Remove current file/dir to action list (marked with `?`)
