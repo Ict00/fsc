@@ -33,11 +33,10 @@ FS Control is a powerful TUI file manager with advanced file operations
 
 ## Display Features
 * **Color coding**:
-  - 🟨 Yellow - Regular file
-  - 🟩 Green - Executable file
-  - 🟦 Cyan - Directory
-  - ⬜ White - `.` or `..` entries
-  - 🟪 Magenta - Symbolic link
+  - Yellow - Regular file
+  - Green - Executable file
+  - Cyan - Directory
+  - White - `.` or `..` entries
 * **Selection indicators**:
   - `>` - Currently selected item
   - `?` - Item in action list

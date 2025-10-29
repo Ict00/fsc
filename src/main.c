@@ -9,6 +9,8 @@
 #include <unistd.h>
 #include <libgen.h>
 
+#define VERSION "0.1"
+
 char** actionEntries = NULL;
 size_t actionCap = 32;
 size_t actionCount = 0;
@@ -188,7 +190,7 @@ void draw() {
 	printf("\x1b[0m");
 	
 	printf("\x1b[104m");
-	bar("F - Search, WASD ENTER - Navigate, P - Run CMD, ` - Run CMD (No output)", true);
+	bar("FSC " VERSION, true);
 	printf("\x1b[0m");
 
 	fflush(stdout);
