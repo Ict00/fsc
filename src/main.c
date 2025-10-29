@@ -396,7 +396,7 @@ int main() {
 				getcwd(path, sizeof(path));
 				update_fs();
 				break;
-			case '`':
+			case ';':
 				execute(false);
 				update_fs();
 				break;

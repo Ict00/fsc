@@ -1,50 +1,89 @@
 # FSC
-FS Control is simple TUI file manager
+FS Control is a powerful TUI file manager with advanced file operations
 
 # Usage
 ## Controls
 
-* I - Add/Remove current file/dir to action list
-* R - Remove all the files/dirs in action list
-* C - Copy all the files/dirs in action list to selected dir
-* M - Move all the files/dirs in action list to selected dir
-* N - Rename all the files/dirs in action list
-* F - Search for file in current dir
-* P - Run CMD (With output)
-* ` - Run CMD (No output)
-* U - Unselect all
-* WS - Move cursor up/down
-* A - Move to parent directory of current dir
-* D/Enter - Change current dir to selected dir
+### Navigation
+* **W/S** - Move cursor up/down
+* **A** - Move to parent directory
+* **D/Enter** - Enter selected directory
+* **K/L** - Page up/down navigation
+* **U** - Unselect all and clear action list
 
-## Colors
-Each color stands for element's type:
-* Yellow - File
-* Green - Executable
-* Cyan - Directory
-* White - . or .. only
-* Magenta - Symlink
+### File Operations
+* **I** - Add/Remove current file/dir to action list (marked with `?`)
+* **R** - Remove all files/dirs in action list (with confirmation)
+* **C** - Copy all files/dirs in action list to selected directory
+* **M** - Move all files/dirs in action list to selected directory
+* **N** - Rename all files/dirs in action list (single file: rename, multiple: numbered)
+
+### Search & Filter
+* **F** - Search for files in current directory (supports wildcards `*`)
+* **Y** - Mass select files matching pattern
+* **V** - View settings - toggle display filters:
+  - `h`/`H` - show/hide hidden files
+  - `d`/`D` - show/hide directories  
+  - `f`/`F` - show/hide regular files
+
+### System Commands
+* **P** - Run command (with output)
+* **;** - Run command (no output)
+* **Q** - Quit
+
+## Display Features
+* **Color coding**:
+  - 🟨 Yellow - Regular file
+  - 🟩 Green - Executable file
+  - 🟦 Cyan - Directory
+  - ⬜ White - `.` or `..` entries
+  - 🟪 Magenta - Symbolic link
+* **Selection indicators**:
+  - `>` - Currently selected item
+  - `?` - Item in action list
+* **Pagination** - Handles large directories efficiently
+
+## Search Patterns
+Supports advanced pattern matching:
+- `*` - Wildcard character
+- `,` - Multiple conditions
+- `\` - Escape special characters
 
 # Quick Start
 
-## Supported platforms
+## Requirements
+Clang with C23 support
+
+## Supported Platforms
 * [x] Linux
-* [x] Mac OS (Need tests)
+* [x] Mac OS (Testing needed)
 * [ ] Windows
 
-## Step 1: Clone repository
+## Installation Options
+
+### Option 1: Using MPT (My Build System)
 ```bash
 $ git clone https://github.com/Ict00/fsc
-```
-
-## Step 2: Build it using MPT
-```bash
+$ cd fsc
 $ mpt build
 ```
 
-## Step 3 (Optional): Put `fsc` binary into directory that's listed in `PATH` variable (for better experience) 
+### Option 2: Using Make
+```bash
+$ git clone https://github.com/Ict00/fsc  
+$ cd fsc
+$ make build
+```
 
-## Step 4: Use it
+## Installation (Optional)
+For best experience, add `fsc` to your PATH:
+```bash
+$ sudo cp fsc /usr/local/bin/  # System-wide
+# OR
+$ cp fsc ~/.local/bin/         # User-specific
+```
+
+## Running
 ```bash
 $ ./fsc
 ```
