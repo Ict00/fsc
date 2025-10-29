@@ -301,7 +301,7 @@ int main() {
 				if (bSel < aSel) {
 					int tempSel = aSel;
 					aSel = bSel;
-					bSel = aSel;
+					bSel = tempSel;
 				}
 				
 				for (int i = aSel; i <= bSel; i++) {
