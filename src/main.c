@@ -294,6 +294,8 @@ int main() {
 				secondSelect = selected;
 				break;
 			case ']':
+				if (secondSelect == -1) break;
+			
 				int aSel = secondSelect;
 				int bSel = selected;
 				
