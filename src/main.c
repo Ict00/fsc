@@ -14,6 +14,7 @@
 char** actionEntries = NULL;
 size_t actionCap = 32;
 size_t actionCount = 0;
+size_t visualActionCount = 0;
 
 char path[4096];
 int page = 0;
@@ -86,6 +87,7 @@ void add2action() {
 				if (strcmp(actionEntries[i], buf) == 0) {
 					free(actionEntries[i]);
 					actionEntries[i] = NULL;
+					visualActionCount--;
 					return;
 				}
 			}
@@ -93,7 +95,7 @@ void add2action() {
 			return;
 		}
 	
-		
+		visualActionCount++;
 		actionEntries[actionCount] = strdup(buf);
 		actionCount++;
 	}
@@ -220,7 +222,8 @@ void draw() {
 	}
 		
 	char buf1[256];
-	sprintf(buf1, "%d OUT OF %d PAGES", page+1, 1+(int)curDirCount/pageSize);
+	
+	sprintf(buf1, "%d OUT OF %d PAGES | Selected: %zu", page+1, 1+(int)curDirCount/pageSize, visualActionCount);
 	
 	printf("\x1b[44m");
 	bar(buf1, true);
@@ -324,6 +327,8 @@ int main() {
 				if (!is_dir(targetBase)) break;
 				
 				for (int i = 0; i < actionCount; i++) {
+					if (actionEntries[i] == NULL) continue;
+					
 					char* dup = strdup(actionEntries[i]);
 					char* base = basename(dup);
 					
@@ -347,6 +352,8 @@ int main() {
 				char* nodeB = escape(curDirEntries[selected]);
 				
 				for (int i = 0; i < actionCount; i++) {
+					if (actionEntries[i] == NULL) continue;
+					
 					char cmd[4096];
 					char* nodeA = escape(actionEntries[i]);
 					
@@ -374,6 +381,7 @@ int main() {
 				free(sure);
 				
 				for (int i = 0; i < actionCount; i++) {
+					if (actionEntries[i] == NULL) continue;
 					char cmd[4096];
 					
 					char* nodeA = escape(actionEntries[i]);
@@ -395,6 +403,8 @@ int main() {
 				if (newName == NULL) break;
 				
 				if (actionCount == 1) {
+					if (actionEntries[0] == NULL) break;
+					
 					char* tpath = strdup(actionEntries[0]);
 					char ntpath[4096];
 					
@@ -405,6 +415,8 @@ int main() {
 				}
 				else {
 					for (int i = 0; i < actionCount; i++) {
+						if (actionEntries[i] == NULL) continue;
+						
 						char* tpath = strdup(actionEntries[0]);
 						char ntpath[4096];
 						
