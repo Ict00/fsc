@@ -212,13 +212,13 @@ char* escape(const char* src) {
 
 static bool contains(const char* a, const char* b) {
 	
-	for (; a[0] != '*' && a[0] != ',' && a[0] != 0; a++) {
-		if (a[0] == '\\') a++;
-		if (b[0] == 0) return false;
-		if (a[0] != b[0]) return false;
+	for (; *a != '*' && *a != ',' && *a != 0; a++) {
+		if (*a == '\\') a++;
+		if (*b == 0) return false;
+		if (*a != *b) return false;
 		b++;
 	}
-	if (a[0] == 0 && b[0] != 0) return false;
+	if (*a == 0 && *b != 0) return false;
 	return true;
 }
 
