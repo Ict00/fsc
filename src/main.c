@@ -29,6 +29,8 @@ size_t curDirCount = 0;
 bool up = true;
 
 void cleanup_actions() {
+	visualActionCount = 0;
+	
 	if (actionEntries == NULL) {
 		actionCap = 32;
 		actionCount = 0;
