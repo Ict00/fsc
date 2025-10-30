@@ -404,7 +404,7 @@ int main() {
 				
 				if (newName == NULL) break;
 				
-				if (actionCount == 1) {
+				if (visualActionCount == 1) {
 					if (actionEntries[0] == NULL) break;
 					
 					char* tpath = strdup(actionEntries[0]);
