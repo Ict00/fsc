@@ -210,6 +210,18 @@ char* escape(const char* src) {
 	return res;
 }
 
+static bool contains(const char* a, const char* b) {
+	
+	for (; a[0] != '*' && a[0] != ',' && a[0] != 0; a++) {
+		if (a[0] == '\\') a++;
+		if (b[0] == 0) return false;
+		if (a[0] != b[0]) return false;
+		b++;
+	}
+	if (a[0] == 0 && b[0] != 0) return false;
+	return true;
+}
+
 bool matches(const char* expr, const char* src) {
 	int ei = 0;
 	int si = 0;
@@ -219,7 +231,7 @@ bool matches(const char* expr, const char* src) {
 	for(; src[si] != 0; si++) {
 		if (expr[ei] == 0) return false;
 		if (expr[ei] == '*') {
-			if (src[si] == expr[ei+1]) {
+			if (contains(&expr[ei+1], &src[si])) { // src[si] == expr[ei+1]
 				ei += 2;
 			}
 			continue;

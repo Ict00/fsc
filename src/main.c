@@ -519,7 +519,7 @@ int main() {
 					selected = 0;
 				}
 				
-				int max = curDirCount/pageSize + 1;
+				int max = curDirCount/pageSize;
 				if (page+1<max) {
 					if (selected + pageSize < curDirCount)
 						selected += pageSize;
