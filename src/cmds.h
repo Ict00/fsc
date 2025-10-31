@@ -21,3 +21,5 @@ void _move_page_up();
 void _move_page_down();
 void _select_by_pattern();
 void _search_by_pattern();
+void _set_jump_mark();
+void _goto_jump_mark();

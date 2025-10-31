@@ -153,6 +153,22 @@ void _deselect() {
 	update_fs();
 }
 
+void _set_jump_mark() {
+	jumpMark[0] = 0;
+	sprintf(jumpMark, "%s", path);
+	jumpSel = selected;
+}
+
+void _goto_jump_mark() {
+	selected = jumpSel;
+	chdir(jumpMark);
+	getcwd(path, sizeof(path));
+
+	update_fs();
+	
+	page = selected/pageSize;
+}
+
 void _move_up() {
 	if (selected == -1)
 		selected = 0;
@@ -254,7 +270,7 @@ void _move_page_down() {
 	}
 	
 	int max = curDirCount/pageSize;
-	if (page+1<max) {
+	if (page+1<=max) {
 		if (selected + pageSize < curDirCount)
 			selected += pageSize;
 		else

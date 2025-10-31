@@ -13,6 +13,7 @@ int main() {
 	printf("\x1b[2J\x1b[H");
 	toggle_input();
 	get_size();
+	jumpMark[0] = 0;
 	pageSize = HEIGHT-2;
 	getcwd(path, sizeof(path));
 	update_fs();
@@ -47,6 +48,8 @@ int main() {
 			CMD_CASE('k', _move_page_up());
 			CMD_CASE('y', _select_by_pattern());
 			CMD_CASE('f', _search_by_pattern());
+			CMD_CASE('b', _set_jump_mark());
+			CMD_CASE('j', _goto_jump_mark());
 		}
 		
 		recalc_termsize();

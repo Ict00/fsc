@@ -8,6 +8,9 @@ extern size_t actionCap;
 extern size_t actionCount;
 extern size_t visualActionCount;
 
+extern char jumpMark[4096];
+extern int jumpSel;
+
 extern char path[4096];
 extern int page;
 extern int pageSize;
