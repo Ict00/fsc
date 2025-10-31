@@ -118,28 +118,36 @@ void _rename() {
 	if (newName == NULL) return;
 	
 	if (visualActionCount == 1) {
-		if (actionEntries[0] == NULL) return;
+		int toRename = 0;
+		for (; actionEntries[toRename] == NULL; toRename++);
 		
-		char* tpath = strdup(actionEntries[0]);
+		if (actionEntries[toRename] == NULL) return;
+		
+		char* tpath = strdup(actionEntries[toRename]);
 		char ntpath[4096];
 		
 		sprintf(ntpath, "%s/%s", dirname(tpath), newName);
-		rename(actionEntries[0], ntpath);
+		rename(actionEntries[toRename], ntpath);
 		
 		free(tpath);
 	}
 	else {
+		int actualI = 0;
 		for (int i = 0; i < actionCount; i++) {
 			if (actionEntries[i] == NULL) continue;
-			
-			char* tpath = strdup(actionEntries[0]);
+						
+			char* tpath = strdup(actionEntries[i]);
 			char ntpath[4096];
 			
-			sprintf(ntpath, "%s/%s%d", dirname(tpath), newName, i+1);
-			free(tpath);
+			sprintf(ntpath, "%s/%s%d", dirname(tpath), newName, actualI+1);
 			rename(actionEntries[i], ntpath);
+			free(tpath);
+			
+			actualI++;
 		}
 	}
+	
+	free(newName);
 	
 	cleanup_actions();
 	
